@@ -1,18 +1,26 @@
-import React from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
 
-import moment from 'moment/min/moment-with-locales.min';
+import moment from "moment/min/moment-with-locales.min";
 
 export default class Time extends React.Component {
   render() {
     return (
-      <View style={[styles[this.props.position].container, this.props.containerStyle[this.props.position]]}>
-        <Text style={[styles[this.props.position].text, this.props.textStyle[this.props.position]]}>
-          {moment(this.props.currentMessage.createdAt).locale(this.context.getLocale()).format('LT')}
+      <View
+        style={[
+          styles[this.props.position].container,
+          this.props.containerStyle[this.props.position]
+        ]}
+      >
+        <Text
+          style={[
+            styles[this.props.position].text,
+            this.props.textStyle[this.props.position]
+          ]}
+        >
+          {moment(this.props.currentMessage.createdAt)
+            .locale(this.context.getLocale())
+            .format("LT")}
         </Text>
       </View>
     );
@@ -22,58 +30,58 @@ export default class Time extends React.Component {
 const containerStyle = {
   marginLeft: 10,
   marginRight: 10,
-  marginBottom: 5,
+  marginBottom: 5
 };
 
 const textStyle = {
   fontSize: 10,
-  backgroundColor: 'transparent',
-  textAlign: 'right',
+  backgroundColor: "transparent",
+  textAlign: "right"
 };
 
 const styles = {
   left: StyleSheet.create({
     container: {
-      ...containerStyle,
+      ...containerStyle
     },
     text: {
-      color: '#aaa',
-      ...textStyle,
-    },
+      color: "#aaa",
+      ...textStyle
+    }
   }),
   right: StyleSheet.create({
     container: {
-      ...containerStyle,
+      ...containerStyle
     },
     text: {
-      color: '#fff',
-      ...textStyle,
-    },
-  }),
+      color: "#fff",
+      ...textStyle
+    }
+  })
 };
 
 Time.contextTypes = {
-  getLocale: React.PropTypes.func,
+  getLocale: React.PropTypes.func
 };
 
 Time.defaultProps = {
-  position: 'left',
+  position: "left",
   currentMessage: {
-    createdAt: null,
+    createdAt: null
   },
   containerStyle: {},
-  textStyle: {},
+  textStyle: {}
 };
 
 Time.propTypes = {
-  position: React.PropTypes.oneOf(['left', 'right']),
+  position: React.PropTypes.oneOf(["left", "right"]),
   currentMessage: React.PropTypes.object,
   containerStyle: React.PropTypes.shape({
     left: View.propTypes.style,
-    right: View.propTypes.style,
+    right: View.propTypes.style
   }),
   textStyle: React.PropTypes.shape({
     left: Text.propTypes.style,
-    right: Text.propTypes.style,
-  }),
+    right: Text.propTypes.style
+  })
 };

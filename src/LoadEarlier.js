@@ -1,12 +1,12 @@
-import React from 'react';
+import React from "react";
 import {
   ActivityIndicator,
   Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
-} from 'react-native';
+  View
+} from "react-native";
 
 export default class LoadEarlier extends React.Component {
   renderLoading() {
@@ -19,14 +19,20 @@ export default class LoadEarlier extends React.Component {
     }
     return (
       <View>
-        <Text style={[styles.text, this.props.textStyle, {
-            opacity: 0,
-          }]}>
+        <Text
+          style={[
+            styles.text,
+            this.props.textStyle,
+            {
+              opacity: 0
+            }
+          ]}
+        >
           {this.props.label}
         </Text>
         <ActivityIndicator
-          color='white'
-          size='small'
+          color="white"
+          size="small"
           style={[styles.activityIndicator, this.props.activityIndicatorStyle]}
         />
       </View>
@@ -42,7 +48,6 @@ export default class LoadEarlier extends React.Component {
           }
         }}
         disabled={this.props.isLoadingEarlier === true}
-        accessibilityTraits="button"
       >
         <View style={[styles.wrapper, this.props.wrapperStyle]}>
           {this.renderLoading()}
@@ -54,40 +59,40 @@ export default class LoadEarlier extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 5,
-    marginBottom: 10,
+    marginBottom: 10
   },
   wrapper: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#b2b2b2',
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#b2b2b2",
     borderRadius: 15,
     height: 30,
     paddingLeft: 10,
-    paddingRight: 10,
+    paddingRight: 10
   },
   text: {
-    backgroundColor: 'transparent',
-    color: '#fff',
-    fontSize: 12,
+    backgroundColor: "transparent",
+    color: "#fff",
+    fontSize: 12
   },
   activityIndicator: {
     marginTop: Platform.select({
       ios: -14,
-      android: -16,
-    }),
+      android: -16
+    })
   }
 });
 
 LoadEarlier.defaultProps = {
   onLoadEarlier: () => {},
   isLoadingEarlier: false,
-  label: 'Load earlier messages',
+  label: "Load earlier messages",
   containerStyle: {},
   wrapperStyle: {},
   textStyle: {},
-  activityIndicatorStyle: {},
+  activityIndicatorStyle: {}
 };
 
 LoadEarlier.propTypes = {
@@ -97,5 +102,5 @@ LoadEarlier.propTypes = {
   containerStyle: View.propTypes.style,
   wrapperStyle: View.propTypes.style,
   textStyle: Text.propTypes.style,
-  activityIndicatorStyle: View.propTypes.style,
+  activityIndicatorStyle: View.propTypes.style
 };

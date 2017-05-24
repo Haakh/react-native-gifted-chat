@@ -1,19 +1,13 @@
-import React from 'react';
-import {
-  StyleSheet,
-  View,
-} from 'react-native';
+import React from "react";
+import { StyleSheet, View } from "react-native";
 
-import Composer from './Composer';
-import Send from './Send';
-import Actions from './Actions';
+import Composer from "./Composer";
+import Send from "./Send";
 
 export default class InputToolbar extends React.Component {
   renderActions() {
     if (this.props.renderActions) {
       return this.props.renderActions(this.props);
-    } else if (this.props.onPressActionButton) {
-      return <Actions {...this.props} />;
     }
     return null;
   }
@@ -22,7 +16,7 @@ export default class InputToolbar extends React.Component {
     if (this.props.renderSend) {
       return this.props.renderSend(this.props);
     }
-    return <Send {...this.props}/>;
+    return <Send {...this.props} />;
   }
 
   renderComposer() {
@@ -30,11 +24,7 @@ export default class InputToolbar extends React.Component {
       return this.props.renderComposer(this.props);
     }
 
-    return (
-      <Composer
-        {...this.props}
-      />
-    );
+    return <Composer {...this.props} />;
   }
 
   renderAccessory() {
@@ -65,16 +55,16 @@ export default class InputToolbar extends React.Component {
 const styles = StyleSheet.create({
   container: {
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#b2b2b2',
-    backgroundColor: '#FFFFFF',
+    borderTopColor: "#b2b2b2",
+    backgroundColor: "#FFFFFF"
   },
   primary: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
+    flexDirection: "row",
+    alignItems: "flex-end"
   },
   accessory: {
-    height: 44,
-  },
+    height: 44
+  }
 });
 
 InputToolbar.defaultProps = {
@@ -84,7 +74,7 @@ InputToolbar.defaultProps = {
   renderComposer: null,
   containerStyle: {},
   primaryStyle: {},
-  accessoryStyle: {},
+  accessoryStyle: {}
 };
 
 InputToolbar.propTypes = {
@@ -92,8 +82,7 @@ InputToolbar.propTypes = {
   renderActions: React.PropTypes.func,
   renderSend: React.PropTypes.func,
   renderComposer: React.PropTypes.func,
-  onPressActionButton: React.PropTypes.func,
   containerStyle: View.propTypes.style,
   primaryStyle: View.propTypes.style,
-  accessoryStyle: View.propTypes.style,
+  accessoryStyle: View.propTypes.style
 };
