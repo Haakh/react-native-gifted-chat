@@ -24,6 +24,7 @@ import Message from "./Message";
 import MessageContainer from "./MessageContainer";
 import Send from "./Send";
 import Time from "./Time";
+import GiftedChatInteractionManager from "./GiftedChatInteractionManager";
 
 // Min and max heights of ToolbarInput and Composer
 // Needed for Composer auto grow and ScrollView animation
@@ -60,6 +61,7 @@ class GiftedChat extends React.Component {
     this.onKeyboardWillHide = this.onKeyboardWillHide.bind(this);
     this.onKeyboardDidShow = this.onKeyboardDidShow.bind(this);
     this.onKeyboardDidHide = this.onKeyboardDidHide.bind(this);
+    this.onInputSizeChanged = this.onInputSizeChanged.bind(this);
     this.onType = this.onType.bind(this);
     this.onSend = this.onSend.bind(this);
     this.getLocale = this.getLocale.bind(this);
@@ -186,10 +188,28 @@ class GiftedChat extends React.Component {
   // TODO
   // setMinInputToolbarHeight
   getMinInputToolbarHeight() {
-    if (this.props.renderAccessory) {
-      return MIN_INPUT_TOOLBAR_HEIGHT * 2;
-    }
-    return MIN_INPUT_TOOLBAR_HEIGHT;
+    return this.props.renderAccessory
+      ? this.props.minInputToolbarHeight * 2
+      : this.props.minInputToolbarHeight;
+  }
+
+  getBasicMessagesContainerHeight(composerHeight = this.state.composerHeight) {
+    return (
+      this.getMaxHeight() - this.calculateInputToolbarHeight(composerHeight)
+    );
+  }
+
+  /**
+   * Returns the height, based on current window size, taking the keyboard into account.
+   */
+  getMessagesContainerHeightWithKeyboard(
+    composerHeight = this.state.composerHeight
+  ) {
+    return (
+      this.getBasicMessagesContainerHeight(composerHeight) -
+      this.getKeyboardHeight() +
+      this.getBottomOffset()
+    );
   }
 
   prepareMessagesContainerHeight(value) {
@@ -202,12 +222,7 @@ class GiftedChat extends React.Component {
   onKeyboardWillShow(e) {
     this.setIsTypingDisabled(true);
     this.setKeyboardHeight(e.endCoordinates.height);
-    const newMessagesContainerHeight =
-      this.getMaxHeight() -
-      (this.state.composerHeight +
-        (this.getMinInputToolbarHeight() - MIN_COMPOSER_HEIGHT)) -
-      this.getKeyboardHeight() +
-      this.props.bottomOffset;
+    const newMessagesContainerHeight = this.getMessagesContainerHeightWithKeyboard();
     if (this.props.isAnimated === true) {
       Animated.timing(this.state.messagesContainerHeight, {
         toValue: newMessagesContainerHeight,
@@ -225,10 +240,7 @@ class GiftedChat extends React.Component {
   onKeyboardWillHide() {
     this.setIsTypingDisabled(true);
     this.setKeyboardHeight(0);
-    const newMessagesContainerHeight =
-      this.getMaxHeight() -
-      (this.state.composerHeight +
-        (this.getMinInputToolbarHeight() - MIN_COMPOSER_HEIGHT));
+    const newMessagesContainerHeight = this.getBasicMessagesContainerHeight();
     if (this.props.isAnimated === true) {
       Animated.timing(this.state.messagesContainerHeight, {
         toValue: newMessagesContainerHeight,
@@ -331,17 +343,35 @@ class GiftedChat extends React.Component {
   }
 
   resetInputToolbar() {
+    const newComposerHeight = MIN_COMPOSER_HEIGHT;
+    const newMessagesContainerHeight = this.getMessagesContainerHeightWithKeyboard(
+      newComposerHeight
+    );
+
     this.setState(previousState => {
       return {
         text: "",
-        composerHeight: MIN_COMPOSER_HEIGHT,
+        composerHeight: newComposerHeight,
         messagesContainerHeight: this.prepareMessagesContainerHeight(
-          this.getMaxHeight() -
-            this.getMinInputToolbarHeight() -
-            this.getKeyboardHeight() +
-            this.props.bottomOffset
+          newMessagesContainerHeight
         )
       };
+    });
+  }
+
+  onInputSizeChanged(size) {
+    const newComposerHeight = Math.max(
+      MIN_COMPOSER_HEIGHT,
+      Math.min(MAX_COMPOSER_HEIGHT, size.height)
+    );
+    const newMessagesContainerHeight = this.getMessagesContainerHeightWithKeyboard(
+      newComposerHeight
+    );
+    this.setState({
+      composerHeight: newComposerHeight,
+      messagesContainerHeight: this.prepareMessagesContainerHeight(
+        newMessagesContainerHeight
+      )
     });
   }
 
@@ -377,13 +407,28 @@ class GiftedChat extends React.Component {
     });
   }
 
+  onInputTextChanged(text) {
+    if (this.getIsTypingDisabled()) {
+      return;
+    }
+    if (this.props.onInputTextChanged) {
+      this.props.onInputTextChanged(text);
+    }
+    this.setState({ text });
+  }
+
   renderInputToolbar() {
     const inputToolbarProps = {
       ...this.props,
       text: this.state.text,
       composerHeight: Math.max(MIN_COMPOSER_HEIGHT, this.state.composerHeight),
-      onChange: this.onType,
-      onSend: this.onSend
+      onInputSizeChanged: this.onInputSizeChanged,
+      onTextChanged: this.onInputTextChanged,
+      onSend: this.onSend,
+      textInputProps: {
+        ...this.props.textInputProps,
+        ref: textInput => this.textInput = textInput
+      }
     };
 
     if (this.props.renderInputToolbar) {
@@ -409,33 +454,51 @@ class GiftedChat extends React.Component {
     return null;
   }
 
+  onInitialLayoutViewLayout(e) {
+    const layout = e.nativeEvent.layout;
+    if (layout.height <= 0) {
+      return;
+    }
+    this.setMaxHeight(layout.height);
+    const newComposerHeight = MIN_COMPOSER_HEIGHT;
+    const newMessagesContainerHeight = this.getMessagesContainerHeightWithKeyboard(
+      newComposerHeight
+    );
+    GiftedChatInteractionManager.runAfterInteractions(() => {
+      this.setState({
+        isInitialized: true,
+        text: "",
+        composerHeight: newComposerHeight,
+        messagesContainerHeight: this.prepareMessagesContainerHeight(
+          newMessagesContainerHeight
+        )
+      });
+    });
+  }
+
+  onMainViewLayout(e) {
+    // fix an issue when keyboard is dismissing during the initialization
+    const layout = e.nativeEvent.layout;
+    if (
+      this.getMaxHeight() !== layout.height || this.getIsFirstLayout() === true
+    ) {
+      this.setMaxHeight(layout.height);
+      this.setState({
+        messagesContainerHeight: this.prepareMessagesContainerHeight(
+          this.getBasicMessagesContainerHeight()
+        )
+      });
+    }
+    if (this.getIsFirstLayout() === true) {
+      this.setIsFirstLayout(false);
+    }
+  }
+
   render() {
     if (this.state.isInitialized === true) {
       return (
         <ActionSheet ref={component => this._actionSheetRef = component}>
-          <View
-            style={styles.container}
-            onLayout={e => {
-              if (Platform.OS === "android") {
-                // fix an issue when keyboard is dismissing during the initialization
-                const layout = e.nativeEvent.layout;
-                if (
-                  this.getMaxHeight() !== layout.height &&
-                  this.getIsFirstLayout() === true
-                ) {
-                  this.setMaxHeight(layout.height);
-                  this.setState({
-                    messagesContainerHeight: this.prepareMessagesContainerHeight(
-                      this.getMaxHeight() - this.getMinInputToolbarHeight()
-                    )
-                  });
-                }
-              }
-              if (this.getIsFirstLayout() === true) {
-                this.setIsFirstLayout(false);
-              }
-            }}
-          >
+          <View style={styles.container} onLayout={this.onMainViewLayout}>
             {this.renderMessages()}
             {this.renderInputToolbar()}
           </View>
@@ -443,23 +506,7 @@ class GiftedChat extends React.Component {
       );
     }
     return (
-      <View
-        style={styles.container}
-        onLayout={e => {
-          const layout = e.nativeEvent.layout;
-          this.setMaxHeight(layout.height);
-          InteractionManager.runAfterInteractions(() => {
-            this.setState({
-              isInitialized: true,
-              text: "",
-              composerHeight: MIN_COMPOSER_HEIGHT,
-              messagesContainerHeight: this.prepareMessagesContainerHeight(
-                this.getMaxHeight() - this.getMinInputToolbarHeight()
-              )
-            });
-          });
-        }}
-      >
+      <View style={styles.container} onLayout={this.onInitialLayoutViewLayout}>
         {this.renderLoading()}
       </View>
     );

@@ -2,6 +2,24 @@ import React from "react";
 import { Platform, StyleSheet, TextInput } from "react-native";
 
 export default class Composer extends React.Component {
+  onChange(e) {
+    const contentSize = e.nativeEvent.contentSize;
+    if (!this.contentSize) {
+      this.contentSize = contentSize;
+      this.props.onInputSizeChanged(this.contentSize);
+    } else if (
+      this.contentSize.width !== contentSize.width ||
+      this.contentSize.height !== contentSize.height
+    ) {
+      this.contentSize = contentSize;
+      this.props.onInputSizeChanged(this.contentSize);
+    }
+  }
+
+  onChangeText(text) {
+    this.props.onTextChanged(text);
+  }
+
   render() {
     return (
       <TextInput
@@ -9,8 +27,9 @@ export default class Composer extends React.Component {
         placeholderTextColor={this.props.placeholderTextColor}
         multiline={this.props.multiline}
         onChange={e => {
-          this.props.onChange(e);
+          this.onChange(e);
         }}
+        onChangeText={text => this.onChangeText(text)}
         style={[
           styles.textInput,
           this.props.textInputStyle,
