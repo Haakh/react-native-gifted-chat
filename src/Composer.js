@@ -4,6 +4,8 @@ import { Platform, StyleSheet, TextInput } from "react-native";
 export default class Composer extends React.Component {
   onChange(e) {
     const contentSize = e.nativeEvent.contentSize;
+    console.log("First", contentSize);
+    console.log("Second", this.contentSize);
     if (!this.contentSize) {
       this.contentSize = contentSize;
       this.props.onInputSizeChanged(this.contentSize);
@@ -26,9 +28,6 @@ export default class Composer extends React.Component {
         placeholder={this.props.placeholder}
         placeholderTextColor={this.props.placeholderTextColor}
         multiline={this.props.multiline}
-        onChange={e => {
-          this.onChange(e);
-        }}
         onChangeText={text => this.onChangeText(text)}
         style={[
           styles.textInput,
