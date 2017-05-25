@@ -382,30 +382,30 @@ class GiftedChat extends React.Component {
     );
   }
 
-  onType(e) {
-    if (this.getIsTypingDisabled() === true) {
-      return;
-    }
-    const newComposerHeight = Math.max(
-      MIN_COMPOSER_HEIGHT,
-      Math.min(MAX_COMPOSER_HEIGHT, e.nativeEvent.contentSize.height)
-    );
-    const newMessagesContainerHeight =
-      this.getMaxHeight() -
-      this.calculateInputToolbarHeight(newComposerHeight) -
-      this.getKeyboardHeight() +
-      this.props.bottomOffset;
-    const newText = e.nativeEvent.text;
-    this.setState(previousState => {
-      return {
-        text: newText,
-        composerHeight: newComposerHeight,
-        messagesContainerHeight: this.prepareMessagesContainerHeight(
-          newMessagesContainerHeight
-        )
-      };
-    });
-  }
+  // onType(e) {
+  //   if (this.getIsTypingDisabled() === true) {
+  //     return;
+  //   }
+  //   const newComposerHeight = Math.max(
+  //     MIN_COMPOSER_HEIGHT,
+  //     Math.min(MAX_COMPOSER_HEIGHT, e.nativeEvent.contentSize.height)
+  //   );
+  //   const newMessagesContainerHeight =
+  //     this.getMaxHeight() -
+  //     this.calculateInputToolbarHeight(newComposerHeight) -
+  //     this.getKeyboardHeight() +
+  //     this.props.bottomOffset;
+  //   const newText = e.nativeEvent.text;
+  //   this.setState(previousState => {
+  //     return {
+  //       text: newText,
+  //       composerHeight: newComposerHeight,
+  //       messagesContainerHeight: this.prepareMessagesContainerHeight(
+  //         newMessagesContainerHeight
+  //       )
+  //     };
+  //   });
+  // }
 
   onInputTextChanged(text) {
     if (this.getIsTypingDisabled()) {
