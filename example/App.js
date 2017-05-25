@@ -1,14 +1,9 @@
-import React from 'react';
-import {
-  Platform,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import React from "react";
+import { Platform, StyleSheet, Text, View } from "react-native";
 
-import {GiftedChat, Actions, Bubble} from 'react-native-gifted-chat';
-import CustomActions from './CustomActions';
-import CustomView from './CustomView';
+import { GiftedChat, Actions, Bubble } from "react-native-gifted-chat";
+import CustomActions from "./CustomActions";
+import CustomView from "./CustomView";
 
 export default class Example extends React.Component {
   constructor(props) {
@@ -17,7 +12,7 @@ export default class Example extends React.Component {
       messages: [],
       loadEarlier: true,
       typingText: null,
-      isLoadingEarlier: false,
+      isLoadingEarlier: false
     };
 
     this._isMounted = false;
@@ -35,7 +30,7 @@ export default class Example extends React.Component {
     this._isMounted = true;
     this.setState(() => {
       return {
-        messages: require('./data/messages.js'),
+        messages: require("./data/messages.js")
       };
     });
   }
@@ -45,19 +40,22 @@ export default class Example extends React.Component {
   }
 
   onLoadEarlier() {
-    this.setState((previousState) => {
+    this.setState(previousState => {
       return {
-        isLoadingEarlier: true,
+        isLoadingEarlier: true
       };
     });
 
     setTimeout(() => {
       if (this._isMounted === true) {
-        this.setState((previousState) => {
+        this.setState(previousState => {
           return {
-            messages: GiftedChat.prepend(previousState.messages, require('./data/old_messages.js')),
+            messages: GiftedChat.prepend(
+              previousState.messages,
+              require("./data/old_messages.js")
+            ),
             loadEarlier: false,
-            isLoadingEarlier: false,
+            isLoadingEarlier: false
           };
         });
       }
@@ -65,9 +63,9 @@ export default class Example extends React.Component {
   }
 
   onSend(messages = []) {
-    this.setState((previousState) => {
+    this.setState(previousState => {
       return {
-        messages: GiftedChat.append(previousState.messages, messages),
+        messages: GiftedChat.append(previousState.messages, messages)
       };
     });
 
@@ -77,10 +75,10 @@ export default class Example extends React.Component {
 
   answerDemo(messages) {
     if (messages.length > 0) {
-      if ((messages[0].image || messages[0].location) || !this._isAlright) {
-        this.setState((previousState) => {
+      if (messages[0].image || messages[0].location || !this._isAlright) {
+        this.setState(previousState => {
           return {
-            typingText: 'React Native is typing'
+            typingText: "React Native is typing"
           };
         });
       }
@@ -90,28 +88,28 @@ export default class Example extends React.Component {
       if (this._isMounted === true) {
         if (messages.length > 0) {
           if (messages[0].image) {
-            this.onReceive('Nice picture!');
+            this.onReceive("Nice picture!");
           } else if (messages[0].location) {
-            this.onReceive('My favorite place');
+            this.onReceive("My favorite place");
           } else {
             if (!this._isAlright) {
               this._isAlright = true;
-              this.onReceive('Alright');
+              this.onReceive("Alright");
             }
           }
         }
       }
 
-      this.setState((previousState) => {
+      this.setState(previousState => {
         return {
-          typingText: null,
+          typingText: null
         };
       });
     }, 1000);
   }
 
   onReceive(text) {
-    this.setState((previousState) => {
+    this.setState(previousState => {
       return {
         messages: GiftedChat.append(previousState.messages, {
           _id: Math.round(Math.random() * 1000000),
@@ -119,37 +117,28 @@ export default class Example extends React.Component {
           createdAt: new Date(),
           user: {
             _id: 2,
-            name: 'React Native',
+            name: "React Native"
             // avatar: 'https://facebook.github.io/react/img/logo_og.png',
-          },
-        }),
+          }
+        })
       };
     });
   }
 
   renderCustomActions(props) {
-    if (Platform.OS === 'ios') {
-      return (
-        <CustomActions
-          {...props}
-        />
-      );
+    if (Platform.OS === "ios") {
+      return <CustomActions {...props} />;
     }
     const options = {
-      'Action 1': (props) => {
-        alert('option 1');
+      "Action 1": props => {
+        alert("option 1");
       },
-      'Action 2': (props) => {
-        alert('option 2');
+      "Action 2": props => {
+        alert("option 2");
       },
-      'Cancel': () => {},
+      Cancel: () => {}
     };
-    return (
-      <Actions
-        {...props}
-        options={options}
-      />
-    );
+    return <Actions {...props} options={options} />;
   }
 
   renderBubble(props) {
@@ -158,7 +147,7 @@ export default class Example extends React.Component {
         {...props}
         wrapperStyle={{
           left: {
-            backgroundColor: '#f0f0f0',
+            backgroundColor: "#f0f0f0"
           }
         }}
       />
@@ -166,11 +155,7 @@ export default class Example extends React.Component {
   }
 
   renderCustomView(props) {
-    return (
-      <CustomView
-        {...props}
-      />
-    );
+    return <CustomView {...props} />;
   }
 
   renderFooter(props) {
@@ -194,11 +179,9 @@ export default class Example extends React.Component {
         loadEarlier={this.state.loadEarlier}
         onLoadEarlier={this.onLoadEarlier}
         isLoadingEarlier={this.state.isLoadingEarlier}
-
         user={{
-          _id: 1, // sent messages should have same user._id
+          _id: 1 // sent messages should have same user._id
         }}
-
         renderActions={this.renderCustomActions}
         renderBubble={this.renderBubble}
         renderCustomView={this.renderCustomView}
@@ -213,10 +196,10 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginLeft: 10,
     marginRight: 10,
-    marginBottom: 10,
+    marginBottom: 10
   },
   footerText: {
     fontSize: 14,
-    color: '#aaa',
-  },
+    color: "#aaa"
+  }
 });
