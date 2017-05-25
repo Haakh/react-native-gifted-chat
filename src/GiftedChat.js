@@ -437,8 +437,8 @@ class GiftedChat extends React.Component {
             }}
           >
             {this.renderMessages()}
-            {this.renderInputToolbar()}
           </View>
+          {this.renderInputToolbar()}
         </ActionSheet>
       );
     }
